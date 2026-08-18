@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Home Page -->
   <url>
-    <loc>https://wasiqs-portfolio.com</loc>
+    <loc>https://wasiq.tech</loc>
     <lastmod>2026-03-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -10,7 +10,7 @@
 
   <!-- Blog - Android Home Server -->
   <url>
-    <loc>https://wasiqs-portfolio.com/blog/android-home-server</loc>
+    <loc>https://wasiq.tech/blog/android-home-server</loc>
     <lastmod>2024-03-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

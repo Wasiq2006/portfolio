@@ -283,14 +283,14 @@ const HeroSection = () => {
         {/* Name Title with Z-Depth Layering */}
         <motion.div style={{ transform: 'translateZ(90px)' }}>
           <h1
-            className="heading-brutal leading-[0.85] tracking-tight"
-            style={{ fontSize: 'clamp(65px, 13vw, 140px)' }}
+            className="heading-brutal leading-[0.9] sm:leading-[0.85] tracking-tight px-2"
+            style={{ fontSize: 'clamp(36px, 11vw, 140px)' }}
           >
-            <div className="glitch-text inline-block" data-text="Muhammad">
+            <div className="glitch-text inline-block break-words max-w-full" data-text="Muhammad">
               Muhammad
             </div>
             <br />
-            <div className="glitch-text inline-block" data-text="Wasiq.">
+            <div className="glitch-text inline-block break-words max-w-full" data-text="Wasiq.">
               <span className="text-foreground/20">Wasiq.</span>
             </div>
           </h1>
@@ -367,16 +367,16 @@ const HeroSection = () => {
         </motion.div>
 
         {/* Resume button with Z-Depth Layering */}
-        <motion.div style={{ transform: 'translateZ(80px)' }} className="mt-10">
+        <motion.div style={{ transform: 'translateZ(80px)' }} className="mt-8 sm:mt-10">
           <Magnetic strength={0.15}>
             <a
               href="/resume.pdf"
               download="Muhammad_Wasiq_Resume.pdf"
               onClick={playClick}
-              className="group relative inline-flex items-center gap-2 px-8 py-4 border-2 border-foreground bg-foreground text-background text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 hover:bg-card hover:text-foreground rounded-none"
-              style={{ boxShadow: '8px 8px 0px 0px currentColor' }}
+              className="group relative inline-flex items-center gap-2 px-6 py-3.5 sm:px-8 sm:py-4 border-2 border-foreground bg-foreground text-background text-xs sm:text-sm font-bold tracking-[0.15em] sm:tracking-[0.2em] uppercase transition-all duration-300 hover:bg-card hover:text-foreground rounded-none"
+              style={{ boxShadow: '6px 6px 0px 0px currentColor' }}
               onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '8px 8px 0px 0px currentColor'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '6px 6px 0px 0px currentColor'; }}
             >
               <span>Download Resume</span>
               <span className="w-2 h-2 border-r-2 border-b-2 border-current rotate-45 -translate-y-[1px] group-hover:translate-y-[1px] transition-transform duration-300"></span>

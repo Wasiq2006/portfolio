@@ -19,10 +19,25 @@ const BlogDetail = () => {
   const navigate = useNavigate();
   const blog = (blogsData.blogs as BlogPost[]).find((b) => b.id === id);
 
-  // Scroll to top when blog detail page loads
+  // Scroll to top and set page title & metadata when blog detail page loads
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [id]);
+    if (blog) {
+      document.title = `${blog.title} | Muhammad Wasiq`;
+
+      const updateMetaTag = (selector: string, content: string) => {
+        let el = document.querySelector(selector);
+        if (el) {
+          el.setAttribute('content', content);
+        }
+      };
+
+      updateMetaTag('meta[property="og:title"]', blog.title);
+      updateMetaTag('meta[property="og:description"]', blog.brief);
+      updateMetaTag('meta[name="twitter:title"]', blog.title);
+      updateMetaTag('meta[name="twitter:description"]', blog.brief);
+    }
+  }, [id, blog]);
 
   // Handle navigation back to blog section
   const handleBackToBlog = () => {
@@ -122,7 +137,7 @@ const BlogDetail = () => {
           elements.push(
             <pre
               key={`code-${idx}`}
-              className="bg-black text-green-400 p-6 rounded-none border-4 border-foreground my-8 overflow-x-auto font-mono text-sm"
+              className="bg-black text-green-400 p-4 sm:p-6 rounded-none border-2 sm:border-4 border-foreground my-6 sm:my-8 overflow-x-auto font-mono text-xs sm:text-sm max-w-full"
               style={{ boxShadow: '4px 4px 0px 0px currentColor' }}
             >
               <code>{codeContent}</code>
@@ -138,28 +153,53 @@ const BlogDetail = () => {
       } else if (inCodeBlock) {
         codeContent += line + '\n';
       } else if (trimmed.startsWith('![') && trimmed.includes('](')) {
-        // Image
+        // Banner / Content Image matching Brutalist Design (Image 2)
         const alt = trimmed.slice(2, trimmed.indexOf(']'));
         const url = trimmed.slice(trimmed.indexOf('(') + 1, trimmed.lastIndexOf(')'));
         elements.push(
-          <div key={idx} className="my-8">
-            <img
-              src={url}
-              alt={alt}
-              className="w-full max-h-[500px] object-cover border-4 border-foreground rounded-none"
+          <div key={idx} className="my-8 sm:my-10 flex flex-col items-center w-full">
+            <div
+              className="w-full max-w-3xl border-4 border-foreground bg-card overflow-hidden rounded-none"
               style={{ boxShadow: '6px 6px 0px 0px currentColor' }}
-            />
-            {alt && <p className="text-xs font-mono text-muted-foreground mt-2 text-center">{alt}</p>}
+            >
+              <img
+                src={url}
+                alt={alt}
+                className="w-full h-auto object-cover max-h-[500px] rounded-none block"
+              />
+            </div>
+            {alt && (
+              <p className="text-xs font-mono text-foreground/80 mt-3 text-center tracking-wide">
+                {alt}
+              </p>
+            )}
           </div>
         );
       } else if (trimmed.startsWith('<iframe')) {
-        // Iframe / Video Embed
+        // Extract src & title from raw iframe tag to render a clean, 100% responsive YouTube frame (Image 1 fix)
+        const srcMatch = trimmed.match(/src="([^"]+)"/i);
+        const titleMatch = trimmed.match(/title="([^"]+)"/i);
+        const videoSrc = srcMatch ? srcMatch[1] : '';
+        const videoTitle = titleMatch ? titleMatch[1] : 'YouTube Video Player';
+
         elements.push(
           <div
             key={idx}
-            className="my-8 border-4 border-foreground overflow-hidden rounded-none shadow-[6px_6px_0px_0px_currentColor]"
-            dangerouslySetInnerHTML={{ __html: trimmed }}
-          />
+            className="my-8 sm:my-10 flex flex-col items-center w-full"
+          >
+            <div
+              className="relative w-full max-w-3xl aspect-video border-4 border-foreground bg-black overflow-hidden rounded-none"
+              style={{ boxShadow: '6px 6px 0px 0px currentColor' }}
+            >
+              <iframe
+                src={videoSrc}
+                title={videoTitle}
+                className="w-full h-full absolute inset-0 border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          </div>
         );
       } else if (trimmed.startsWith('>')) {
         // Blockquote
@@ -167,7 +207,7 @@ const BlogDetail = () => {
         elements.push(
           <blockquote
             key={idx}
-            className="my-6 border-l-4 border-foreground bg-card/60 p-5 pl-6 font-medium text-foreground/90 italic rounded-none"
+            className="my-6 border-l-4 border-foreground bg-card/60 p-4 sm:p-5 pl-5 sm:pl-6 font-medium text-foreground/90 italic rounded-none text-sm sm:text-base"
             style={{ boxShadow: '4px 4px 0px 0px currentColor' }}
           >
             {renderFormattedText(quoteText)}
@@ -175,19 +215,19 @@ const BlogDetail = () => {
         );
       } else if (trimmed.startsWith('# ')) {
         elements.push(
-          <h1 key={idx} className="text-4xl md:text-5xl font-black mt-16 mb-6 border-b-4 border-foreground pb-4">
+          <h1 key={idx} className="text-2xl sm:text-4xl md:text-5xl font-black mt-10 sm:mt-16 mb-4 sm:mb-6 border-b-2 sm:border-b-4 border-foreground pb-3 sm:pb-4 leading-tight break-words">
             {renderFormattedText(trimmed.replace('# ', ''))}
           </h1>
         );
       } else if (trimmed.startsWith('## ')) {
         elements.push(
-          <h2 key={idx} className="text-3xl font-black mt-12 mb-4 border-b-2 border-foreground pb-3">
+          <h2 key={idx} className="text-xl sm:text-3xl font-black mt-8 sm:mt-12 mb-3 border-b-2 border-foreground pb-2 sm:pb-3 leading-snug break-words">
             {renderFormattedText(trimmed.replace('## ', ''))}
           </h2>
         );
       } else if (trimmed.startsWith('### ')) {
         elements.push(
-          <h3 key={idx} className="text-2xl font-bold mt-8 mb-3">
+          <h3 key={idx} className="text-lg sm:text-2xl font-bold mt-6 sm:mt-8 mb-2 leading-snug break-words">
             {renderFormattedText(trimmed.replace('### ', ''))}
           </h3>
         );
@@ -198,10 +238,10 @@ const BlogDetail = () => {
           elements.push(
             <ul
               key={`list-${idx}`}
-              className="list-disc list-inside mb-6 space-y-3 bg-card border-l-4 border-foreground p-6 rounded-none"
+              className="list-disc list-inside mb-6 space-y-2 bg-card border-l-4 border-foreground p-4 sm:p-6 rounded-none text-sm sm:text-base"
             >
               {listItems.map((item, i) => (
-                <li key={i} className="text-foreground/80 font-medium">
+                <li key={i} className="text-foreground/80 font-medium break-words">
                   {renderFormattedText(item)}
                 </li>
               ))}
@@ -211,11 +251,11 @@ const BlogDetail = () => {
         }
       } else if (trimmed.startsWith('---')) {
         elements.push(
-          <div key={idx} className="my-10 border-t-4 border-foreground" />
+          <div key={idx} className="my-8 sm:my-10 border-t-2 sm:border-t-4 border-foreground" />
         );
       } else if (trimmed) {
         elements.push(
-          <p key={idx} className="text-foreground/80 mb-6 leading-relaxed text-lg">
+          <p key={idx} className="text-foreground/80 mb-5 sm:mb-6 leading-relaxed text-base sm:text-lg break-words">
             {renderFormattedText(trimmed)}
           </p>
         );
@@ -231,20 +271,20 @@ const BlogDetail = () => {
       
       {/* Hero Section */}
       <div className="border-b-4 border-foreground bg-background">
-        <div className="max-w-4xl mx-auto px-4 md:px-6 py-16 md:py-24">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 py-12 sm:py-16 md:py-24">
           <button
             onClick={handleBackToBlog}
-            className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest border-b-2 border-foreground pb-1 hover:gap-4 transition-all mb-8 hover:translate-x-1"
+            className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest border-b-2 border-foreground pb-1 hover:gap-4 transition-all mb-6 sm:mb-8 hover:translate-x-1"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Blog
           </button>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-8 leading-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 sm:mb-8 leading-tight break-words">
             {blog.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-6 text-sm border-t-2 border-foreground pt-6">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm border-t-2 border-foreground pt-4 sm:pt-6">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               <span className="font-medium">
@@ -255,7 +295,7 @@ const BlogDetail = () => {
                 })}
               </span>
             </div>
-              <span className="font-mono font-bold uppercase tracking-widest bg-foreground text-background px-3 py-1">
+            <span className="font-mono font-bold uppercase tracking-widest bg-foreground text-background px-2.5 py-1 text-[11px] sm:text-xs">
               {blog.readTime}
             </span>
           </div>
@@ -263,19 +303,19 @@ const BlogDetail = () => {
       </div>
 
       {/* Content Section */}
-      <article className="max-w-4xl mx-auto px-4 md:px-6 py-12 md:py-20">
+      <article className="max-w-4xl mx-auto px-4 md:px-6 py-8 sm:py-12 md:py-20">
         <div className="prose prose-lg max-w-none">
           {renderContent(blog.content)}
         </div>
 
         {/* Back Button */}
-        <div className="mt-20 pt-8 border-t-4 border-foreground flex justify-center md:justify-start">
+        <div className="mt-12 sm:mt-20 pt-6 sm:pt-8 border-t-2 sm:border-t-4 border-foreground flex justify-center md:justify-start">
           <button
             onClick={handleBackToBlog}
-            className="inline-flex items-center gap-2 px-8 py-4 border-3 border-foreground bg-card text-foreground text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:shadow-none hover:translate-x-1 hover:translate-y-1 hover:bg-foreground hover:text-background rounded-none"
-            style={{ boxShadow: '6px 6px 0px 0px currentColor' }}
+            className="inline-flex items-center gap-2 px-6 py-3.5 sm:px-8 sm:py-4 border-2 sm:border-3 border-foreground bg-card text-foreground text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:shadow-none hover:translate-x-1 hover:translate-y-1 hover:bg-foreground hover:text-background rounded-none"
+            style={{ boxShadow: '4px 4px 0px 0px currentColor' }}
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             Back to All Blogs
           </button>
         </div>

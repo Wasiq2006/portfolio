@@ -27,12 +27,12 @@ const BlogSection = () => {
           DevOps, and system administration.
         </p>
 
-        <div className="flex md:grid md:grid-cols-2 gap-8 overflow-x-auto md:overflow-x-visible pt-2 pb-6 md:py-0 snap-x snap-mandatory scrollbar-hide px-4 md:px-0 -mx-4 md:mx-0">
+        <div className="flex md:grid md:grid-cols-2 gap-8 overflow-x-auto md:overflow-x-visible pt-6 pb-12 md:py-0 snap-x snap-mandatory scrollbar-hide px-4 md:px-0 -mx-4 md:mx-0">
           {posts.length > 0 ? (
             posts.map((post) => (
               <Scroll3DCard
                 key={post.id}
-                className="min-w-[280px] sm:min-w-[320px] w-[85vw] md:w-auto snap-start flex-shrink-0 md:flex-shrink"
+                className="min-w-[290px] sm:min-w-[320px] w-[85vw] md:w-auto snap-start flex-shrink-0 md:flex-shrink"
               >
                 <article
                   className="group relative border-4 border-foreground bg-card p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1 rounded-none h-full"
