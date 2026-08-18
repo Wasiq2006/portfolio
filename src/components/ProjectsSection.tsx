@@ -54,8 +54,8 @@ const ProjectsSection = () => {
             className="min-w-[300px] w-full md:w-auto snap-start flex-shrink-0 md:flex-shrink"
           >
             <div
-              className="group relative border-4 border-foreground p-8 flex flex-col justify-between hover:-translate-x-1 hover:-translate-y-1 transition-all duration-300 bg-card h-full rounded-none"
-              style={{ boxShadow: '10px 10px 0px 0px transparent' }}
+              className="group relative border-4 border-foreground p-8 flex flex-col justify-between hover:-translate-x-1 hover:-translate-y-1 transition-all duration-300 bg-card h-full rounded-none touch-pan-x touch-pan-y"
+              style={{ boxShadow: '10px 10px 0px 0px transparent', touchAction: 'pan-x pan-y' }}
               onMouseEnter={(e) => { playHover(); (e.currentTarget as HTMLElement).style.boxShadow = '10px 10px 0px 0px currentColor'; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '10px 10px 0px 0px transparent'; }}
             >

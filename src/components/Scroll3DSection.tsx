@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from 'react';
+import { useRef, useState, useEffect, type ReactNode } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 
 interface Scroll3DSectionProps {
@@ -13,6 +13,16 @@ export const Scroll3DSection = ({
   depth = 8,
 }: Scroll3DSectionProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isPointerFine, setIsPointerFine] = useState(true);
+
+  useEffect(() => {
+    const checkPointer = () => {
+      setIsPointerFine(window.matchMedia('(pointer: fine)').matches);
+    };
+    checkPointer();
+    window.addEventListener('resize', checkPointer);
+    return () => window.removeEventListener('resize', checkPointer);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -30,6 +40,14 @@ export const Scroll3DSection = ({
   const rotateX = useTransform(smoothProgress, [0, 1], [depth, 0]);
   const scale = useTransform(smoothProgress, [0, 1], [0.97, 1]);
   const opacity = useTransform(smoothProgress, [0, 1], [0.2, 1]);
+
+  if (!isPointerFine) {
+    return (
+      <div ref={containerRef} className={`w-full ${className}`}>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div

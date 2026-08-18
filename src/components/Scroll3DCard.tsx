@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useRef, useState, useEffect, type ReactNode } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 
 interface Scroll3DCardProps {
@@ -15,6 +15,16 @@ export const Scroll3DCard = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
+  const [isPointerFine, setIsPointerFine] = useState(true);
+
+  useEffect(() => {
+    const checkPointer = () => {
+      setIsPointerFine(window.matchMedia('(pointer: fine)').matches);
+    };
+    checkPointer();
+    window.addEventListener('resize', checkPointer);
+    return () => window.removeEventListener('resize', checkPointer);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: cardRef,
@@ -27,6 +37,18 @@ export const Scroll3DCard = ({
   });
 
   const scrollRotateX = useTransform(smoothScroll, [0, 1], [intensity, 0]);
+
+  if (!isPointerFine) {
+    return (
+      <div
+        ref={cardRef}
+        className={`relative ${className}`}
+        style={{ touchAction: 'pan-x pan-y' }}
+      >
+        {children}
+      </div>
+    );
+  }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current || !window.matchMedia('(pointer: fine)').matches) return;

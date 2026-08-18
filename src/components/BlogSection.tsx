@@ -40,8 +40,8 @@ const BlogSection = () => {
                 className="min-w-[290px] sm:min-w-[320px] w-[85vw] md:w-auto snap-start flex-shrink-0 md:flex-shrink"
               >
                 <article
-                  className="group relative border-4 border-foreground bg-card p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1 rounded-none h-full"
-                  style={{ boxShadow: '8px 8px 0px 0px transparent' }}
+                  className="group relative border-4 border-foreground bg-card p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1 rounded-none h-full touch-pan-x touch-pan-y"
+                  style={{ boxShadow: '8px 8px 0px 0px transparent', touchAction: 'pan-x pan-y' }}
                   onMouseEnter={(e) => { playHover(); (e.currentTarget as HTMLElement).style.boxShadow = '8px 8px 0px 0px currentColor'; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '8px 8px 0px 0px transparent'; }}
                 >
