@@ -57,6 +57,53 @@ const BlogDetail = () => {
     );
   }
 
+  // Render formatted inline markdown (links, bold, italic, inline code)
+  const renderFormattedText = (text: string): React.ReactNode => {
+    const regex = /(\[.*?\]\(.*?\)|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(text.substring(lastIndex, match.index));
+      }
+      const token = match[0];
+      if (token.startsWith('[')) {
+        const linkText = token.slice(1, token.indexOf(']'));
+        const url = token.slice(token.indexOf('(') + 1, token.lastIndexOf(')'));
+        parts.push(
+          <a
+            key={match.index}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary underline font-bold hover:opacity-80 transition-opacity"
+          >
+            {linkText}
+          </a>
+        );
+      } else if (token.startsWith('**')) {
+        parts.push(<strong key={match.index} className="font-black text-foreground">{token.slice(2, -2)}</strong>);
+      } else if (token.startsWith('*')) {
+        parts.push(<em key={match.index} className="italic text-foreground/90">{token.slice(1, -1)}</em>);
+      } else if (token.startsWith('`')) {
+        parts.push(
+          <code key={match.index} className="bg-muted px-1.5 py-0.5 font-mono text-sm border border-foreground/20">
+            {token.slice(1, -1)}
+          </code>
+        );
+      }
+      lastIndex = regex.lastIndex;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : text;
+  };
+
   // Parse markdown content
   const renderContent = (content: string) => {
     const lines = content.split('\n');
@@ -67,8 +114,10 @@ const BlogDetail = () => {
     let listItems: string[] = [];
 
     lines.forEach((line, idx) => {
+      const trimmed = line.trim();
+
       // Handle code blocks
-      if (line.startsWith('```')) {
+      if (trimmed.startsWith('```')) {
         if (inCodeBlock) {
           elements.push(
             <pre
@@ -84,33 +133,68 @@ const BlogDetail = () => {
           codeLanguage = '';
         } else {
           inCodeBlock = true;
-          codeLanguage = line.replace('```', '').trim();
+          codeLanguage = trimmed.replace('```', '').trim();
         }
       } else if (inCodeBlock) {
         codeContent += line + '\n';
-      } else if (line.startsWith('# ')) {
+      } else if (trimmed.startsWith('![') && trimmed.includes('](')) {
+        // Image
+        const alt = trimmed.slice(2, trimmed.indexOf(']'));
+        const url = trimmed.slice(trimmed.indexOf('(') + 1, trimmed.lastIndexOf(')'));
+        elements.push(
+          <div key={idx} className="my-8">
+            <img
+              src={url}
+              alt={alt}
+              className="w-full max-h-[500px] object-cover border-4 border-foreground rounded-none"
+              style={{ boxShadow: '6px 6px 0px 0px currentColor' }}
+            />
+            {alt && <p className="text-xs font-mono text-muted-foreground mt-2 text-center">{alt}</p>}
+          </div>
+        );
+      } else if (trimmed.startsWith('<iframe')) {
+        // Iframe / Video Embed
+        elements.push(
+          <div
+            key={idx}
+            className="my-8 border-4 border-foreground overflow-hidden rounded-none shadow-[6px_6px_0px_0px_currentColor]"
+            dangerouslySetInnerHTML={{ __html: trimmed }}
+          />
+        );
+      } else if (trimmed.startsWith('>')) {
+        // Blockquote
+        const quoteText = trimmed.replace(/^>\s*/, '');
+        elements.push(
+          <blockquote
+            key={idx}
+            className="my-6 border-l-4 border-foreground bg-card/60 p-5 pl-6 font-medium text-foreground/90 italic rounded-none"
+            style={{ boxShadow: '4px 4px 0px 0px currentColor' }}
+          >
+            {renderFormattedText(quoteText)}
+          </blockquote>
+        );
+      } else if (trimmed.startsWith('# ')) {
         elements.push(
           <h1 key={idx} className="text-4xl md:text-5xl font-black mt-16 mb-6 border-b-4 border-foreground pb-4">
-            {line.replace('# ', '')}
+            {renderFormattedText(trimmed.replace('# ', ''))}
           </h1>
         );
-      } else if (line.startsWith('## ')) {
+      } else if (trimmed.startsWith('## ')) {
         elements.push(
           <h2 key={idx} className="text-3xl font-black mt-12 mb-4 border-b-2 border-foreground pb-3">
-            {line.replace('## ', '')}
+            {renderFormattedText(trimmed.replace('## ', ''))}
           </h2>
         );
-      } else if (line.startsWith('### ')) {
+      } else if (trimmed.startsWith('### ')) {
         elements.push(
           <h3 key={idx} className="text-2xl font-bold mt-8 mb-3">
-            {line.replace('### ', '')}
+            {renderFormattedText(trimmed.replace('### ', ''))}
           </h3>
         );
-      } else if (line.startsWith('* ')) {
-        if (!listItems.includes(line)) {
-          listItems.push(line);
-        }
-        if (idx === lines.length - 1 || !lines[idx + 1].startsWith('* ')) {
+      } else if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+        const itemText = trimmed.slice(2).trim();
+        listItems.push(itemText);
+        if (idx === lines.length - 1 || (!lines[idx + 1].trim().startsWith('* ') && !lines[idx + 1].trim().startsWith('- '))) {
           elements.push(
             <ul
               key={`list-${idx}`}
@@ -118,27 +202,22 @@ const BlogDetail = () => {
             >
               {listItems.map((item, i) => (
                 <li key={i} className="text-foreground/80 font-medium">
-                  {item.replace('* ', '')}
+                  {renderFormattedText(item)}
                 </li>
               ))}
             </ul>
           );
           listItems = [];
         }
-      } else if (line.startsWith('---')) {
+      } else if (trimmed.startsWith('---')) {
         elements.push(
           <div key={idx} className="my-10 border-t-4 border-foreground" />
         );
-      } else if (line.trim()) {
+      } else if (trimmed) {
         elements.push(
           <p key={idx} className="text-foreground/80 mb-6 leading-relaxed text-lg">
-            {line}
+            {renderFormattedText(trimmed)}
           </p>
-        );
-      } else if (elements.length > 0 && idx < lines.length - 1) {
-        // Add spacing between sections
-        elements.push(
-          <div key={idx} className="mb-2" />
         );
       }
     });

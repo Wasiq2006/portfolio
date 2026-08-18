@@ -9,6 +9,7 @@ import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import BlogDetail from './pages/BlogDetail';
 import LoadingPage from './components/LoadingPage';
+import SmoothScroll from './components/SmoothScroll';
 import { useTheme } from './hooks/useTheme';
 
 const queryClient = new QueryClient();
@@ -20,18 +21,20 @@ const AppContent = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <BrowserRouter>
-          <div className="relative">
-            {isAnimating && <div className="disk-transition-overlay" />}
-            <LoadingPage />
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/blog/:id" element={<BlogDetail />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Analytics />
-          </div>
+          <SmoothScroll>
+            <div className="relative">
+              {isAnimating && <div className="disk-transition-overlay" />}
+              <LoadingPage />
+              <Toaster />
+              <Sonner />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/blog/:id" element={<BlogDetail />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Analytics />
+            </div>
+          </SmoothScroll>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

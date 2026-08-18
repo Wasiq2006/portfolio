@@ -1,22 +1,68 @@
-<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Shield Background -->
-  <path d="M96 12C96 12 144 36 144 84C144 132 96 180 96 180C96 180 48 132 48 84C48 36 96 12 96 12Z" fill="#1a1a1a" stroke="#00ff88" stroke-width="2.5"/>
-  
-  <!-- Shield Inner Border -->
-  <path d="M96 20C96 20 138 42 138 84C138 128 96 172 96 172C96 172 54 128 54 84C54 42 96 20 96 20Z" fill="none" stroke="#00ff88" stroke-width="1.5" opacity="0.6"/>
-  
-  <!-- Lock Body -->
-  <rect x="78" y="95" width="28" height="32" rx="3" fill="none" stroke="#00ff88" stroke-width="2"/>
-  
-  <!-- Lock Shackle (top part) -->
-  <path d="M82 95C82 75 110 75 110 95" fill="none" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round"/>
-  
-  <!-- Lock Keyhole -->
-  <circle cx="96" cy="111" r="2.5" fill="#00ff88"/>
-  
-  <!-- Decorative Corner Elements (tech aesthetic) -->
-  <circle cx="52" cy="65" r="2" fill="#00ff88" opacity="0.8"/>
-  <circle cx="140" cy="65" r="2" fill="#00ff88" opacity="0.8"/>
-  <circle cx="65" cy="155" r="2" fill="#00ff88" opacity="0.8"/>
-  <circle cx="127" cy="155" r="2" fill="#00ff88" opacity="0.8"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Clean White Background Canvas -->
+  <rect width="512" height="512" rx="96" fill="#ffffff"/>
+  <rect x="16" y="16" width="480" height="480" rx="80" fill="none" stroke="#181818" stroke-width="16"/>
+
+  <!-- Unlit Matrix Background Dots (Subtle dot matrix screen effect) -->
+  <g opacity="0.08" fill="#181818">
+    <!-- Row 0 -->
+    <circle cx="76" cy="148" r="13"/><circle cx="112" cy="148" r="13"/><circle cx="148" cy="148" r="13"/><circle cx="184" cy="148" r="13"/><circle cx="220" cy="148" r="13"/>
+    <circle cx="292" cy="148" r="13"/><circle cx="328" cy="148" r="13"/><circle cx="364" cy="148" r="13"/><circle cx="400" cy="148" r="13"/><circle cx="436" cy="148" r="13"/>
+    <!-- Row 1 -->
+    <circle cx="76" cy="184" r="13"/><circle cx="112" cy="184" r="13"/><circle cx="148" cy="184" r="13"/><circle cx="184" cy="184" r="13"/><circle cx="220" cy="184" r="13"/>
+    <circle cx="292" cy="184" r="13"/><circle cx="328" cy="184" r="13"/><circle cx="364" cy="184" r="13"/><circle cx="400" cy="184" r="13"/><circle cx="436" cy="184" r="13"/>
+    <!-- Row 2 -->
+    <circle cx="76" cy="220" r="13"/><circle cx="112" cy="220" r="13"/><circle cx="148" cy="220" r="13"/><circle cx="184" cy="220" r="13"/><circle cx="220" cy="220" r="13"/>
+    <circle cx="292" cy="220" r="13"/><circle cx="328" cy="220" r="13"/><circle cx="364" cy="220" r="13"/><circle cx="400" cy="220" r="13"/><circle cx="436" cy="220" r="13"/>
+    <!-- Row 3 -->
+    <circle cx="76" cy="256" r="13"/><circle cx="112" cy="256" r="13"/><circle cx="148" cy="256" r="13"/><circle cx="184" cy="256" r="13"/><circle cx="220" cy="256" r="13"/>
+    <circle cx="292" cy="256" r="13"/><circle cx="328" cy="256" r="13"/><circle cx="364" cy="256" r="13"/><circle cx="400" cy="256" r="13"/><circle cx="436" cy="256" r="13"/>
+    <!-- Row 4 -->
+    <circle cx="76" cy="292" r="13"/><circle cx="112" cy="292" r="13"/><circle cx="148" cy="292" r="13"/><circle cx="184" cy="292" r="13"/><circle cx="220" cy="292" r="13"/>
+    <circle cx="292" cy="292" r="13"/><circle cx="328" cy="292" r="13"/><circle cx="364" cy="292" r="13"/><circle cx="400" cy="292" r="13"/><circle cx="436" cy="292" r="13"/>
+    <!-- Row 5 -->
+    <circle cx="76" cy="328" r="13"/><circle cx="112" cy="328" r="13"/><circle cx="148" cy="328" r="13"/><circle cx="184" cy="328" r="13"/><circle cx="220" cy="328" r="13"/>
+    <circle cx="292" cy="328" r="13"/><circle cx="328" cy="328" r="13"/><circle cx="364" cy="328" r="13"/><circle cx="400" cy="328" r="13"/><circle cx="436" cy="328" r="13"/>
+    <!-- Row 6 -->
+    <circle cx="76" cy="364" r="13"/><circle cx="112" cy="364" r="13"/><circle cx="148" cy="364" r="13"/><circle cx="184" cy="364" r="13"/><circle cx="220" cy="364" r="13"/>
+    <circle cx="292" cy="364" r="13"/><circle cx="328" cy="364" r="13"/><circle cx="364" cy="364" r="13"/><circle cx="400" cy="364" r="13"/><circle cx="436" cy="364" r="13"/>
+  </g>
+
+  <!-- Active Dot Matrix Characters: "W" (left) and "M" (right) in Dark #181818 -->
+  <g fill="#181818">
+    <!-- --- LETTER 'W' --- -->
+    <!-- Row 0: 1 0 0 0 1 -->
+    <circle cx="76" cy="148" r="14"/><circle cx="220" cy="148" r="14"/>
+    <!-- Row 1: 1 0 0 0 1 -->
+    <circle cx="76" cy="184" r="14"/><circle cx="220" cy="184" r="14"/>
+    <!-- Row 2: 1 0 0 0 1 -->
+    <circle cx="76" cy="220" r="14"/><circle cx="220" cy="220" r="14"/>
+    <!-- Row 3: 1 0 1 0 1 -->
+    <circle cx="76" cy="256" r="14"/><circle cx="148" cy="256" r="14"/><circle cx="220" cy="256" r="14"/>
+    <!-- Row 4: 1 0 1 0 1 -->
+    <circle cx="76" cy="292" r="14"/><circle cx="148" cy="292" r="14"/><circle cx="220" cy="292" r="14"/>
+    <!-- Row 5: 1 0 1 0 1 -->
+    <circle cx="76" cy="328" r="14"/><circle cx="148" cy="328" r="14"/><circle cx="220" cy="328" r="14"/>
+    <!-- Row 6: 0 1 0 1 0 -->
+    <circle cx="112" cy="364" r="14"/><circle cx="184" cy="364" r="14"/>
+
+    <!-- --- LETTER 'M' --- -->
+    <!-- Row 0: 1 0 0 0 1 -->
+    <circle cx="292" cy="148" r="14"/><circle cx="436" cy="148" r="14"/>
+    <!-- Row 1: 1 1 0 1 1 -->
+    <circle cx="292" cy="184" r="14"/><circle cx="328" cy="184" r="14"/><circle cx="400" cy="184" r="14"/><circle cx="436" cy="184" r="14"/>
+    <!-- Row 2: 1 0 1 0 1 -->
+    <circle cx="292" cy="220" r="14"/><circle cx="364" cy="220" r="14"/><circle cx="436" cy="220" r="14"/>
+    <!-- Row 3: 1 0 1 0 1 -->
+    <circle cx="292" cy="256" r="14"/><circle cx="364" cy="256" r="14"/><circle cx="436" cy="256" r="14"/>
+    <!-- Row 4: 1 0 0 0 1 -->
+    <circle cx="292" cy="292" r="14"/><circle cx="436" cy="292" r="14"/>
+    <!-- Row 5: 1 0 0 0 1 -->
+    <circle cx="292" cy="328" r="14"/><circle cx="436" cy="328" r="14"/>
+    <!-- Row 6: 1 0 0 0 1 -->
+    <circle cx="292" cy="364" r="14"/><circle cx="436" cy="364" r="14"/>
+  </g>
+
+  <!-- Accent Red Dot (Brand Accent) -->
+  <circle cx="256" cy="364" r="14" fill="#d93829"/>
 </svg>

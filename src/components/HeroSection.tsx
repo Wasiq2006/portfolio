@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'framer-motion';
 import { playClick, playHover } from '@/hooks/useSoundEffects';
 import {
   Github,
@@ -32,7 +33,44 @@ const HeroSection = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(true);
   const [theme, setTheme] = useState('light');
+
+  const containerRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // 3D Mouse Parallax values
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { stiffness: 100, damping: 24, mass: 0.5 };
+  const springMouseX = useSpring(mouseX, springConfig);
+  const springMouseY = useSpring(mouseY, springConfig);
+
+  const rotateX = useTransform(springMouseY, [-0.5, 0.5], [12, -12]);
+  const rotateY = useTransform(springMouseX, [-0.5, 0.5], [-12, 12]);
+
+  // 3D Scroll Depth values
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end start'],
+  });
+
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.88]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 100]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!containerRef.current) return;
+    const { width, height, left, top } = containerRef.current.getBoundingClientRect();
+    const x = (e.clientX - left) / width - 0.5;
+    const y = (e.clientY - top) / height - 0.5;
+    mouseX.set(x);
+    mouseY.set(y);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
 
   // Listen for theme changes
   useEffect(() => {
@@ -43,9 +81,9 @@ const HeroSection = () => {
 
     checkTheme();
     const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, { 
-      attributes: true, 
-      attributeFilter: ['class'] 
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
     });
 
     return () => observer.disconnect();
@@ -82,69 +120,47 @@ const HeroSection = () => {
     return () => clearTimeout(timeout);
   }, [displayText, isDeleting, roleIndex]);
 
-  // Matrix-style rain effect using requestAnimationFrame + prefers-reduced-motion check
+  // High-Contrast Theme-Adaptive Matrix Rain Canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Skip animation for users who prefer reduced motion
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (motionQuery.matches) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Helper function to get CSS variable and convert HSL to RGB
-    const getCSSColorAsRGB = (varName: string): string => {
-      const root = document.documentElement;
-      const hslValue = getComputedStyle(root).getPropertyValue(varName).trim();
-      
-      if (!hslValue) return 'rgb(0, 0, 0)';
+    const isMidnight = document.documentElement.classList.contains('midnight-indigo');
 
-      // Parse HSL value (e.g., "0 0% 5%")
-      const parts = hslValue.split(' ');
-      const h = parseFloat(parts[0]);
-      const s = parseFloat(parts[1]) / 100;
-      const l = parseFloat(parts[2]) / 100;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let width = window.innerWidth;
+    let height = window.innerHeight;
 
-      // HSL to RGB conversion
-      const c = (1 - Math.abs(2 * l - 1)) * s;
-      const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-      const m = l - c / 2;
-      
-      let r = 0, g = 0, b = 0;
-      if (h < 60) { r = c; g = x; b = 0; }
-      else if (h < 120) { r = x; g = c; b = 0; }
-      else if (h < 180) { r = 0; g = c; b = x; }
-      else if (h < 240) { r = 0; g = x; b = c; }
-      else if (h < 300) { r = x; g = 0; b = c; }
-      else { r = c; g = 0; b = x; }
-
-      r = Math.round((r + m) * 255);
-      g = Math.round((g + m) * 255);
-      b = Math.round((b + m) * 255);
-      
-      return `rgb(${r}, ${g}, ${b})`;
-    };
-
-    // Get theme-aware background and foreground colors
-    const backgroundColor = getCSSColorAsRGB('--background');
-    const foregroundColor = getCSSColorAsRGB('--foreground');
+    const fontSize = 14;
+    let columns = Math.floor(width / fontSize);
+    let drops: number[] = Array(columns).fill(0).map(() => Math.floor(Math.random() * -50));
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.scale(dpr, dpr);
+
+      columns = Math.floor(width / fontSize);
+      drops = Array(columns).fill(0).map(() => Math.floor(Math.random() * -50));
     };
+
     resize();
     window.addEventListener('resize', resize);
 
-    const chars = '01{}[]<>/*#=+-;:.abcdefghijklmnopqrstuvwxyz';
-    const fontSize = 14;
-    const columns = Math.floor(canvas.width / fontSize);
-    const drops: number[] = Array(columns).fill(1);
+    const chars = '01{}[];:/*#=+-<>_$%&@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
     let lastFrameTime = 0;
-    const frameInterval = 60; // ~16fps throttle
+    const frameInterval = 45; // ~22fps matrix speed
     let animationId: number;
 
     const draw = (timestamp: number) => {
@@ -153,40 +169,42 @@ const HeroSection = () => {
       if (timestamp - lastFrameTime < frameInterval) return;
       lastFrameTime = timestamp;
 
-      // Use theme-aware background fade
-      const bgColor = backgroundColor.match(/\d+/g);
-      if (bgColor) {
-        ctx.fillStyle = `rgba(${bgColor[0]}, ${bgColor[1]}, ${bgColor[2]}, 0.04)`;
-      } else {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.04)'; // fallback
-      }
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.font = `${fontSize}px monospace`;
+      // Background trail clear
+      ctx.fillStyle = isMidnight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(245, 245, 245, 0.08)';
+      ctx.fillRect(0, 0, width, height);
+      ctx.font = `600 ${fontSize}px "Courier New", monospace`;
 
       for (let i = 0; i < drops.length; i++) {
         const char = chars[Math.floor(Math.random() * chars.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
 
-        // Lead character — brighter (using foreground color)
-        const fgColor = foregroundColor.match(/\d+/g);
-        if (fgColor) {
-          ctx.fillStyle = `rgba(${fgColor[0]}, ${fgColor[1]}, ${fgColor[2]}, 0.15)`;
-        } else {
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.15)'; // fallback
-        }
-        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-
-        // Trail character — slightly dimmer
-        if (drops[i] > 1) {
-          const trailChar = chars[Math.floor(Math.random() * chars.length)];
-          if (fgColor) {
-            ctx.fillStyle = `rgba(${fgColor[0]}, ${fgColor[1]}, ${fgColor[2]}, 0.07)`;
+        if (y > 0) {
+          // Leading character (darker & crisp)
+          if (isMidnight) {
+            ctx.fillStyle = 'rgba(74, 222, 128, 0.8)';
+            ctx.shadowColor = '#22c55e';
+            ctx.shadowBlur = 3;
           } else {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.07)'; // fallback
+            ctx.fillStyle = 'rgba(30, 41, 59, 0.7)';
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
           }
-          ctx.fillText(trailChar, i * fontSize, (drops[i] - 1) * fontSize);
+          ctx.fillText(char, x, y);
+
+          // Trail characters (dimmer & subtle)
+          const trailChar = chars[Math.floor(Math.random() * chars.length)];
+          if (isMidnight) {
+            ctx.fillStyle = 'rgba(34, 197, 94, 0.4)';
+            ctx.shadowBlur = 0;
+          } else {
+            ctx.fillStyle = 'rgba(51, 65, 85, 0.45)';
+            ctx.shadowBlur = 0;
+          }
+          ctx.fillText(trailChar, x, y - fontSize);
         }
 
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.97) {
+        if (y > height && Math.random() > 0.975) {
           drops[i] = 0;
         }
         drops[i]++;
@@ -201,17 +219,31 @@ const HeroSection = () => {
   }, [theme]);
 
   return (
-    <section className="min-h-screen flex flex-col justify-center items-center relative px-6 overflow-hidden pb-12 bg-background">
-      {/* Matrix rain canvas */}
+    <section
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="min-h-screen flex flex-col justify-center items-center relative px-6 overflow-hidden pb-12 bg-background perspective-1200"
+      style={{ perspective: '1200px' }}
+    >
+      {/* Matrix rain canvas background */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="absolute inset-0 z-0 pointer-events-none opacity-45"
         aria-hidden="true"
       />
 
-      {/* Top-left code comment */}
-      <div className="absolute top-28 left-6 md:left-10 z-10 hidden md:block">
-        <p className="font-mono text-xs text-foreground/90 leading-relaxed font-medium">
+      {/* Cyber Grid background overlay */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none opacity-20 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:36px_36px]"
+      />
+
+      {/* Top-left code comment with 3D Depth */}
+      <motion.div
+        style={{ rotateX, rotateY, translateZ: '30px' }}
+        className="absolute top-28 left-6 md:left-10 z-10 hidden md:block preserve-3d"
+      >
+        <p className="font-mono text-xs text-foreground/90 leading-relaxed font-medium bg-card/80 backdrop-blur-sm p-3 border border-foreground/10 shadow-sm">
           // portfolio.tsx
           <br />
           // version: 3.0.0
@@ -220,57 +252,77 @@ const HeroSection = () => {
           <br />
           // last_build: {new Date().toISOString().split('T')[0]}
         </p>
-      </div>
+      </motion.div>
 
-      {/* Top-right line numbers */}
-      <div className="absolute top-28 right-6 md:right-10 z-10 hidden md:block">
-        <p className="font-mono text-xs text-foreground/80 leading-relaxed text-right font-medium">
+      {/* Top-right line numbers with 3D Depth */}
+      <motion.div
+        style={{ rotateX, rotateY, translateZ: '30px' }}
+        className="absolute top-28 right-6 md:right-10 z-10 hidden md:block preserve-3d"
+      >
+        <p className="font-mono text-xs text-foreground/80 leading-relaxed text-right font-medium bg-card/80 backdrop-blur-sm p-3 border border-foreground/10 shadow-sm">
           {Array.from({ length: 6 }, (_, i) => (
             <span key={i} className="block">
               {String(i + 1).padStart(3, '0')}
             </span>
           ))}
         </p>
-      </div>
+      </motion.div>
 
-      {/* Main content */}
-      <div className="text-center relative z-10 pt-24 md:pt-20">
-        {/* Name */}
-        <h1
-          className="heading-brutal leading-[0.85]"
-          style={{ fontSize: 'clamp(65px, 13vw, 140px)' }}
+      {/* Main 3D Framer Motion Perspective Container */}
+      <motion.div
+        style={{
+          rotateX,
+          rotateY,
+          scale: heroScale,
+          opacity: heroOpacity,
+          y: heroY,
+          transformStyle: 'preserve-3d',
+        }}
+        className="text-center relative z-10 pt-24 md:pt-20 max-w-4xl mx-auto"
+      >
+        {/* Name Title with Z-Depth Layering */}
+        <motion.div style={{ transform: 'translateZ(90px)' }}>
+          <h1
+            className="heading-brutal leading-[0.85] tracking-tight"
+            style={{ fontSize: 'clamp(65px, 13vw, 140px)' }}
+          >
+            <div className="glitch-text inline-block" data-text="Muhammad">
+              Muhammad
+            </div>
+            <br />
+            <div className="glitch-text inline-block" data-text="Wasiq.">
+              <span className="text-foreground/20">Wasiq.</span>
+            </div>
+          </h1>
+        </motion.div>
+
+        {/* Typewriter role with Z-Depth Layering */}
+        <motion.div
+          style={{ transform: 'translateZ(60px)' }}
+          className="mt-6 h-8 flex items-center justify-center"
         >
-          <div className="glitch-text" data-text="Muhammad">
-            Muhammad
-          </div>
-          <br />
-          <div className="glitch-text" data-text="Wasiq.">
-            <span className="text-foreground/20">Wasiq.</span>
-          </div>
-        </h1>
-
-        {/* Typewriter role */}
-        <div className="mt-6 h-8 flex items-center justify-center">
           <span className="font-mono text-xs md:text-sm tracking-[0.2em] text-foreground/50">
             {'< '}
           </span>
-          <span className="font-mono text-xs md:text-sm tracking-[0.15em] text-foreground/70 font-medium">
+          <span className="font-mono text-xs md:text-sm tracking-[0.15em] text-foreground/80 font-bold">
             {displayText}
           </span>
           <span
-            className={`font-mono text-xs md:text-sm text-foreground/70 transition-opacity duration-100 ${
-              cursorVisible ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`font-mono text-xs md:text-sm text-foreground/80 transition-opacity duration-100 ${cursorVisible ? 'opacity-100' : 'opacity-0'
+              }`}
           >
             |
           </span>
           <span className="font-mono text-xs md:text-sm tracking-[0.2em] text-foreground/50">
             {' />'}
           </span>
-        </div>
+        </motion.div>
 
-        {/* Tech tags */}
-        <div className="flex flex-wrap gap-2 justify-center mt-8 max-w-md mx-auto">
+        {/* Tech tags with Z-Depth Layering */}
+        <motion.div
+          style={{ transform: 'translateZ(45px)' }}
+          className="flex flex-wrap gap-2 justify-center mt-8 max-w-md mx-auto"
+        >
           {[
             'Cybersecurity',
             'Cloud Security',
@@ -278,16 +330,19 @@ const HeroSection = () => {
           ].map((tech) => (
             <span
               key={tech}
-              className="px-3 py-1 font-mono text-xs border-2 border-foreground/40 text-foreground/80 font-medium tracking-wider hover:bg-foreground hover:text-background transition-all duration-300 cursor-default rounded-none"
+              className="px-3 py-1 font-mono text-xs border-2 border-foreground/40 bg-card/60 backdrop-blur-sm text-foreground/90 font-bold tracking-wider hover:bg-foreground hover:text-background transition-all duration-300 cursor-default rounded-none shadow-sm"
               onMouseEnter={playHover}
             >
               {tech}
             </span>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Social links */}
-        <div className="flex gap-4 justify-center mt-10">
+        {/* Social links with Z-Depth Layering */}
+        <motion.div
+          style={{ transform: 'translateZ(55px)' }}
+          className="flex gap-4 justify-center mt-10"
+        >
           {SOCIAL_LINKS.map((link) => {
             const Icon = ICON_MAP[link.id];
             if (!Icon) return null;
@@ -309,39 +364,32 @@ const HeroSection = () => {
               </Magnetic>
             );
           })}
-        </div>
+        </motion.div>
 
-        {/* Resume button */}
-        <div className="mt-10">
-          <Magnetic strength={0.1}>
+        {/* Resume button with Z-Depth Layering */}
+        <motion.div style={{ transform: 'translateZ(80px)' }} className="mt-10">
+          <Magnetic strength={0.15}>
             <a
               href="/resume.pdf"
               download="Muhammad_Wasiq_Resume.pdf"
               onClick={playClick}
               className="group relative inline-flex items-center gap-2 px-8 py-4 border-2 border-foreground bg-foreground text-background text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 hover:bg-card hover:text-foreground rounded-none"
-              style={{ boxShadow: '8px 8px 0px 0px rgba(var(--foreground-rgb, 0 0 0), 0.2)' }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '8px 8px 0px 0px currentColor'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '8px 8px 0px 0px rgba(var(--foreground-rgb, 0 0 0), 0.2)'; }}
+              style={{ boxShadow: '8px 8px 0px 0px currentColor' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '8px 8px 0px 0px currentColor'; }}
             >
               <span>Download Resume</span>
               <span className="w-2 h-2 border-r-2 border-b-2 border-current rotate-45 -translate-y-[1px] group-hover:translate-y-[1px] transition-transform duration-300"></span>
             </a>
           </Magnetic>
-        </div>
-      </div>
-
-      {/* Bottom-left info */}
-      <div className="absolute bottom-10 left-6 md:left-10 z-10">
-        <span className="text-foreground text-xs tracking-[0.2em] uppercase font-mono font-medium">
-          {PROFILE.website}
-        </span>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Bottom-right stats */}
       <div className="absolute bottom-10 right-6 md:right-10 z-10 hidden md:block">
-        <div className="font-mono text-xs text-foreground text-right leading-relaxed font-medium">
+        <div className="font-mono text-xs text-foreground text-right leading-relaxed font-medium bg-card/80 backdrop-blur-sm p-2.5 border border-foreground/10">
           <p>const experience = "2+ years";</p>
-          <p>const projects = 10;</p>
+          <p>const projects = 2;</p>
           <p>const passion = Infinity;</p>
         </div>
       </div>

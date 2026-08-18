@@ -1,7 +1,15 @@
 import SectionBlock from './SectionBlock';
 import { playHover } from '@/hooks/useSoundEffects';
 
-const experiences: any[] = [
+interface ExperienceItem {
+  role: string;
+  company: string;
+  companyUrl: string;
+  period: string;
+  description: React.ReactNode;
+}
+
+const experiences: ExperienceItem[] = [
   {
     role: 'Community Admin & Linux Mentor',
     company: 'CS-Connect Pakistan',

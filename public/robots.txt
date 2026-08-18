@@ -1,4 +1,4 @@
-Sitemap: https://wasiqs-portfolio.com/sitemap.xml
+Sitemap: https://wasiq.tech/sitemap.xml
 
 User-agent: Googlebot
 Allow: /

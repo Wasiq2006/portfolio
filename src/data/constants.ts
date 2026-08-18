@@ -7,6 +7,7 @@ export const PROFILE = {
   shortName: 'Muhammad Wasiq',
   alias: 'Wasiq',
   email: 'wasiqmansoor2006@gmail.com',
+  website: 'wasiqs-portfolio.com',
 } as const;
 
 export const SOCIAL_LINKS = [
