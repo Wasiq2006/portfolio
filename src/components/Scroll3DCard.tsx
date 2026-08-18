@@ -29,14 +29,19 @@ export const Scroll3DCard = ({
   const scrollRotateX = useTransform(smoothScroll, [0, 1], [intensity, 0]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || !window.matchMedia('(pointer: fine)').matches) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
     setHoverPos({ x, y });
   };
 
-  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseEnter = () => {
+    if (window.matchMedia('(pointer: fine)').matches) {
+      setIsHovered(true);
+    }
+  };
+
   const handleMouseLeave = () => {
     setIsHovered(false);
     setHoverPos({ x: 0, y: 0 });
@@ -45,8 +50,8 @@ export const Scroll3DCard = ({
   return (
     <div
       ref={cardRef}
-      style={{ perspective: '1000px' }}
-      className={`relative ${className}`}
+      style={{ perspective: '1000px', touchAction: 'pan-x pan-y' }}
+      className={`relative touch-pan-x touch-pan-y ${className}`}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

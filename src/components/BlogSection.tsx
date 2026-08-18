@@ -29,7 +29,10 @@ const BlogSection = () => {
           DevOps, and system administration.
         </p>
 
-        <div className="flex md:grid md:grid-cols-2 gap-8 overflow-x-auto md:overflow-x-visible pt-6 pb-12 md:py-0 snap-x snap-mandatory scrollbar-hide px-4 md:px-0 -mx-4 md:mx-0">
+        <div
+          className="flex md:grid md:grid-cols-2 gap-8 overflow-x-auto md:overflow-x-visible pt-6 pb-12 md:py-0 snap-x snap-mandatory scrollbar-hide px-4 md:px-0 -mx-4 md:mx-0 touch-pan-x touch-pan-y"
+          style={{ touchAction: 'pan-x pan-y' }}
+        >
           {posts.length > 0 ? (
             posts.map((post) => (
               <Scroll3DCard

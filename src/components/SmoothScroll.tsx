@@ -12,7 +12,27 @@ export const SmoothScroll = ({ children }: SmoothScrollProps) => {
   const prevPathname = useRef(pathname);
 
   useEffect(() => {
-    // Disable automatic browser scroll restoration to control it explicitly
+    const isPointerFine = window.matchMedia('(pointer: fine)').matches;
+
+    // Save scroll position on scroll when on main page
+    const handleScroll = () => {
+      if (window.location.pathname === '/') {
+        sessionStorage.setItem('portfolio_scroll_pos', String(window.scrollY));
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // On mobile touch devices, use native 120Hz smooth scrolling to prevent card scroll stuck issues
+    if (!isPointerFine) {
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'auto';
+      }
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }
+
+    // Disable automatic browser scroll restoration to control it explicitly on desktop
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
@@ -24,18 +44,9 @@ export const SmoothScroll = ({ children }: SmoothScrollProps) => {
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 1.5,
     });
 
     lenisRef.current = lenis;
-
-    // Save scroll position on scroll when on main page
-    const handleScroll = () => {
-      if (window.location.pathname === '/') {
-        sessionStorage.setItem('portfolio_scroll_pos', String(window.scrollY));
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
 
     const restoreSavedScroll = () => {
       const savedPos = sessionStorage.getItem('portfolio_scroll_pos');
