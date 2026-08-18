@@ -21,9 +21,20 @@ const blogData = JSON.parse(fs.readFileSync(blogJsonPath, 'utf8'));
 console.log('Generating static blog HTML pages for link previews (WhatsApp, LinkedIn, Twitter)...');
 
 blogData.blogs.forEach((post) => {
-  const postUrl = `https://wasiq.tech/blog/${post.id}`;
+  const postUrl = `https://www.wasiq.tech/blog/${post.id}`;
   const rawImage = post.image || '/images/Banner.png';
-  const imageUrl = rawImage.startsWith('http') ? rawImage : `https://wasiq.tech${rawImage}`;
+  
+  // Prefer optimized JPG (< 100KB) for WhatsApp crawler compatibility
+  let ogImageRelative = rawImage;
+  if (rawImage.endsWith('.png')) {
+    const jpgCandidate = rawImage.replace('.png', '_og.jpg');
+    if (fs.existsSync(path.join(projectRoot, 'public', jpgCandidate))) {
+      ogImageRelative = jpgCandidate;
+    }
+  }
+
+  const imageUrl = ogImageRelative.startsWith('http') ? ogImageRelative : `https://www.wasiq.tech${ogImageRelative}`;
+  const imageType = imageUrl.endsWith('.jpg') || imageUrl.endsWith('.jpeg') ? 'image/jpeg' : 'image/png';
 
   let html = templateHtml;
 
@@ -43,9 +54,10 @@ blogData.blogs.forEach((post) => {
   // Replace og:url
   html = html.replace(/<meta\s+property="og:url"\s+content=".*?"\s*\/?>/gi, `<meta property="og:url" content="${postUrl}" />`);
 
-  // Replace og:image & og:image:secure_url & twitter:image
+  // Replace og:image & og:image:secure_url & og:image:type & twitter:image
   html = html.replace(/<meta\s+property="og:image"\s+content=".*?"\s*\/?>/gi, `<meta property="og:image" content="${imageUrl}" />`);
   html = html.replace(/<meta\s+property="og:image:secure_url"\s+content=".*?"\s*\/?>/gi, `<meta property="og:image:secure_url" content="${imageUrl}" />`);
+  html = html.replace(/<meta\s+property="og:image:type"\s+content=".*?"\s*\/?>/gi, `<meta property="og:image:type" content="${imageType}" />`);
   html = html.replace(/<meta\s+name="twitter:image"\s+content=".*?"\s*\/?>/gi, `<meta name="twitter:image" content="${imageUrl}" />`);
 
   // Ensure output directory dist/blog/[id]
