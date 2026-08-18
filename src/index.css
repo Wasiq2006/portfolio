@@ -57,8 +57,8 @@
     --popover: 225 22% 20%;
     --popover-foreground: 35 73% 94%;
 
-    --primary: 225 22% 17%;
-    --primary-foreground: 35 73% 94%;
+    --primary: 35 73% 94%;
+    --primary-foreground: 225 22% 17%;
 
     --secondary: 225 22% 25%;
     --secondary-foreground: 35 73% 94%;
@@ -78,8 +78,8 @@
 
     --sidebar-background: 225 22% 18%;
     --sidebar-foreground: 35 73% 94%;
-    --sidebar-primary: 225 22% 17%;
-    --sidebar-primary-foreground: 35 73% 94%;
+    --sidebar-primary: 35 73% 94%;
+    --sidebar-primary-foreground: 225 22% 17%;
     --sidebar-accent: 35 60% 50%;
     --sidebar-accent-foreground: 225 22% 17%;
     --sidebar-border: 225 22% 25%;

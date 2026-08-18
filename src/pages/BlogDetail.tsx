@@ -106,7 +106,7 @@ const BlogDetail = () => {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary underline font-bold hover:opacity-80 transition-opacity"
+            className="text-blue-600 dark:text-blue-400 font-bold underline decoration-2 underline-offset-2 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
             onClick={(e) => e.stopPropagation()}
           >
             {linkText}
