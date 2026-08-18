@@ -11,6 +11,8 @@ interface BlogPost {
   brief: string;
   publishedAt: string;
   readTime: string;
+  image?: string;
+  mediumUrl?: string;
   content: string;
 }
 
@@ -32,10 +34,17 @@ const BlogDetail = () => {
         }
       };
 
+      const ogImageUrl = blog.image
+        ? (blog.image.startsWith('http') ? blog.image : `https://wasiq.tech${blog.image}`)
+        : 'https://wasiq.tech/images/Banner.png';
+
       updateMetaTag('meta[property="og:title"]', blog.title);
       updateMetaTag('meta[property="og:description"]', blog.brief);
+      updateMetaTag('meta[property="og:image"]', ogImageUrl);
+      updateMetaTag('meta[property="og:image:secure_url"]', ogImageUrl);
       updateMetaTag('meta[name="twitter:title"]', blog.title);
       updateMetaTag('meta[name="twitter:description"]', blog.brief);
+      updateMetaTag('meta[name="twitter:image"]', ogImageUrl);
     }
   }, [id, blog]);
 
@@ -85,8 +94,12 @@ const BlogDetail = () => {
       }
       const token = match[0];
       if (token.startsWith('[')) {
-        const linkText = token.slice(1, token.indexOf(']'));
-        const url = token.slice(token.indexOf('(') + 1, token.lastIndexOf(')'));
+        const lastBracketIndex = token.lastIndexOf(']');
+        const linkText = token.slice(1, lastBracketIndex);
+        let url = token.slice(lastBracketIndex + 2, token.length - 1).trim();
+        if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('mailto:') && !url.startsWith('#') && !url.startsWith('/')) {
+          url = `https://${url}`;
+        }
         parts.push(
           <a
             key={match.index}
@@ -94,6 +107,7 @@ const BlogDetail = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary underline font-bold hover:opacity-80 transition-opacity"
+            onClick={(e) => e.stopPropagation()}
           >
             {linkText}
           </a>
@@ -298,6 +312,22 @@ const BlogDetail = () => {
             <span className="font-mono font-bold uppercase tracking-widest bg-foreground text-background px-2.5 py-1 text-[11px] sm:text-xs">
               {blog.readTime}
             </span>
+
+            {blog.mediumUrl && (
+              <a
+                href={blog.mediumUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => playClick()}
+                className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 border-2 border-foreground bg-card text-foreground text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 hover:bg-foreground hover:text-background rounded-none ml-auto"
+                style={{ boxShadow: '3px 3px 0px 0px currentColor' }}
+              >
+                <span>Read On Medium:</span>
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42c1.87 0 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z" />
+                </svg>
+              </a>
+            )}
           </div>
         </div>
       </div>
@@ -308,8 +338,8 @@ const BlogDetail = () => {
           {renderContent(blog.content)}
         </div>
 
-        {/* Back Button */}
-        <div className="mt-12 sm:mt-20 pt-6 sm:pt-8 border-t-2 sm:border-t-4 border-foreground flex justify-center md:justify-start">
+        {/* Back and Medium Action Buttons */}
+        <div className="mt-12 sm:mt-20 pt-6 sm:pt-8 border-t-2 sm:border-t-4 border-foreground flex flex-wrap items-center justify-between gap-4">
           <button
             onClick={handleBackToBlog}
             className="inline-flex items-center gap-2 px-6 py-3.5 sm:px-8 sm:py-4 border-2 sm:border-3 border-foreground bg-card text-foreground text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:shadow-none hover:translate-x-1 hover:translate-y-1 hover:bg-foreground hover:text-background rounded-none"
@@ -318,6 +348,22 @@ const BlogDetail = () => {
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             Back to All Blogs
           </button>
+
+          {blog.mediumUrl && (
+            <a
+              href={blog.mediumUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => playClick()}
+              className="inline-flex items-center gap-2 px-6 py-3.5 sm:px-8 sm:py-4 border-2 sm:border-3 border-foreground bg-card text-foreground text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:shadow-none hover:translate-x-1 hover:translate-y-1 hover:bg-foreground hover:text-background rounded-none"
+              style={{ boxShadow: '4px 4px 0px 0px currentColor' }}
+            >
+              <span>Read On Medium:</span>
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42c1.87 0 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z" />
+              </svg>
+            </a>
+          )}
         </div>
       </article>
     </div>

@@ -12,6 +12,8 @@ interface BlogPost {
   brief: string;
   publishedAt: string;
   readTime: string;
+  image?: string;
+  mediumUrl?: string;
   content: string;
 }
 
