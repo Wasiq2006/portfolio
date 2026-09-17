@@ -63,22 +63,37 @@ interface ProjectCardProps {
 const ProjectCard = ({ project, index, total, scrollYProgress }: ProjectCardProps) => {
   const navigate = useNavigate();
 
-  const centerProgress = index / (total - 1);
-  const distance = 1 / (total - 1); 
+  const getScaleRange = () => {
+    if (index === 0) return [0, 0, 0.5];
+    if (index === 1) return [0, 0.5, 1];
+    if (index === 2) return [0.5, 1, 1];
+    return [0, 0.5, 1];
+  };
 
+  const getScaleOutput = () => {
+    if (index === 0) return [1, 1, 0.75];
+    if (index === 1) return [0.75, 1, 0.75];
+    if (index === 2) return [0.75, 1, 1];
+    return [0.75, 1, 0.75];
+  };
 
+  const scale = useTransform(scrollYProgress, getScaleRange(), getScaleOutput());
 
-  const scale = useTransform(
-    scrollYProgress,
-    [centerProgress - distance, centerProgress, centerProgress + distance],
-    [0.75, 1, 0.75]
-  );
+  const getOpacityRange = () => {
+    if (index === 0) return [0, 0.05, 0.45, 0.55];
+    if (index === 1) return [0, 0.45, 0.55, 1];
+    if (index === 2) return [0.45, 0.55, 1, 1];
+    return [0, 0.45, 0.55, 1];
+  };
 
-  const opacity = useTransform(
-    scrollYProgress,
-    [centerProgress - distance, centerProgress - 0.05, centerProgress + 0.05, centerProgress + distance],
-    [0, 1, 1, 0]
-  );
+  const getOpacityOutput = () => {
+    if (index === 0) return [1, 1, 1, 0];
+    if (index === 1) return [0, 1, 1, 0];
+    if (index === 2) return [0, 1, 1, 1];
+    return [0, 1, 1, 0];
+  };
+
+  const opacity = useTransform(scrollYProgress, getOpacityRange(), getOpacityOutput());
 
   return (
     <motion.div
@@ -178,7 +193,7 @@ const ProjectsSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    // Determine which project is closest to center
+    if (typeof latest !== 'number' || isNaN(latest)) return;
     const index = Math.min(projects.length - 1, Math.round(latest * (projects.length - 1)));
     setCurrentIndex(index);
   });
