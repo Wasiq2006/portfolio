@@ -3,7 +3,7 @@ import {
   Server,
   Cpu,
   Wrench,
-  Zap,
+  Brain,
   Layers,
   Box,
 } from 'lucide-react';
@@ -26,17 +26,16 @@ const skillCategories = [
     ],
   },
   {
-    title: 'Cloud Security & Containerization',
-    icon: <Zap className="w-5 h-5" />,
+    title: 'Artificial Intelligence',
+    icon: <Brain className="w-5 h-5" />,
     color: 'bg-orange-50',
     skills: [
-      'Docker',
-      'Kubernetes',
-      'CI/CD Pipelines',
-      'System Automation',
-      'Infrastructure as Code',
-      'Container Orchestration',
-      'Cloud Deployment',
+      'Computer Vision',
+      'YOLOv8',
+      'Object Detection',
+      'Model Inference',
+      'Severity Scoring',
+      'FastAPI',
     ],
   },
   {
@@ -73,7 +72,6 @@ const skillCategories = [
     color: 'bg-blue-50',
     skills: [
       'Python',
-      'Lua',
       'Powershell',
       'C++',
       'Bash/Shell',
@@ -86,6 +84,9 @@ const skillCategories = [
     color: 'bg-gray-50',
     skills: [
       'Git',
+      'Docker',
+      'Kubernetes',
+      'CI/CD Pipelines',
       'AWS',
       'Kali Linux',
       'GitHub',

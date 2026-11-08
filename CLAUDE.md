@@ -1,10 +1,10 @@
-# CLAUDE.md — Muhammad Wasiq's Portfolio
+# CLAUDE.md — Wasiq Mansoor's Portfolio
 
 Context and conventions for AI assistants working on this codebase.
 
 ## Project Overview
 
-Personal portfolio for Muhammad Wasiq Mansoor (Cybersecurity & Cloud Security Engineer), live at **https://www.wasiq.tech**. It is a static, client-side React SPA with a neo-brutalist look: matrix-rain hero, an interactive terminal (Ctrl+K), a GitHub contribution graph, scroll-driven 3D cards, a markdown blog, sound effects and a two-theme toggle.
+Personal portfolio for Wasiq Mansoor (Cyber Security & Artificial Intelligence), live at **https://www.wasiq.tech**. It is a static, client-side React SPA with a neo-brutalist look: matrix-rain hero, an interactive terminal (Ctrl+K), a GitHub contribution graph, a projects index (desktop) / swipeable card deck (phone), a markdown blog, sound effects and a two-theme toggle.
 
 There is **no backend**. It deploys to Vercel as static files (`vercel.json`).
 
@@ -79,6 +79,9 @@ npm run type-check   # tsc --noEmit
 - The contact form opens the visitor's mail client (`mailto:`), with no network request.
 - `GithubGraph.tsx` shows the `Wasiq2006` GitHub calendar.
 - `SmoothScroll.tsx` runs Lenis and starts after the `loading-animation-complete` event from `LoadingPage`.
+- **ω mark:** a 9×7 dot-matrix omega defined in `src/data/omega.json`, rendered by `OmegaMark.tsx`; used only by the loading screen.
+- **Icons:** `public/favicon.svg` (tab icon: plain ω, white on black) and `public/apple-touch-icon.svg` (180px home-screen icon: ω on a faint LED grid) are the sources. After editing either, run `npm run icons` to rebuild `favicon.ico` and `apple-touch-icon.png`.
+- **Loader** (`LoadingAnimation.tsx`): ω lights up on a faint grid, pulses, then wipes up once fonts + `load` are done (capped at 3 s). Any click/key/scroll/touch skips it. It is a custom dot bitmap on purpose: Nothing's NDot font is brand-restricted, and Google's Doto has no ω glyph.
 
 ## Git
 

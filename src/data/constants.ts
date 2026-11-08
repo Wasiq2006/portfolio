@@ -3,8 +3,8 @@
 // ──────────────────────────────────────
 
 export const PROFILE = {
-  name: 'Muhammad Wasiq',
-  shortName: 'Muhammad Wasiq',
+  name: 'Wasiq Mansoor',
+  shortName: 'Wasiq Mansoor',
   alias: 'Wasiq',
   email: 'wasiqmansoor2006@gmail.com',
   website: 'www.wasiq.tech',

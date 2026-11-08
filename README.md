@@ -1,6 +1,6 @@
-# 🚀 Muhammad Wasiq's Portfolio
+# 🚀 Wasiq Mansoor's Portfolio
 
-**Cybersecurity Engineer And Cloud Security Engineer**
+**Cyber Security & Artificial Intelligence**
 
 [**Live Demo**](https://wasiq.tech/)
 

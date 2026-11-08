@@ -15,6 +15,7 @@ import {
 } from '@/hooks/useSoundEffects';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { PROFILE, SOCIAL_LINKS, getSocialLink } from '@/data/constants';
+import { PROJECTS } from '@/data/projects';
 
 interface CommandOutput {
   id: number;
@@ -133,7 +134,7 @@ const Terminal = () => {
         case 'cat education.txt':
           return 'Currently pursuing BSCS at SZABIST, specializing in Cybersecurity and DevOps.';
         case 'cat roadmap.sh':
-          return 'Next up: Mastering Cloud Security, build secure CI/CD pipelines, deepen pentesting skills, contribute to open-source security projects.';
+          return 'Next up: Deepening AI and computer vision, build secure CI/CD pipelines, deepen pentesting skills, contribute to open-source security projects.';
         case 'about':
           return `I'm ${PROFILE.name}, a CS student passionate about cybersecurity and DevOps. I explore system security and infrastructure automation through hands-on projects.`;
         case 'skills':
@@ -141,7 +142,8 @@ const Terminal = () => {
             <div>
               <p className="mb-1 text-yellow-400">CORE SPECIALIZATIONS:</p>
               <p>• Cybersecurity & Network Security</p>
-              <p>• Cloud Security & Containerization</p>
+              <p>• Artificial Intelligence & Computer Vision</p>
+              <p>• DevOps & Containerization</p>
               <p>• Linux & System Administration</p>
               <p>• Cryptography & Encryption</p>
               <p>• Penetration Testing & Threat Analysis</p>
@@ -152,12 +154,11 @@ const Terminal = () => {
           return (
             <div className="flex flex-col gap-1">
               <p className="mb-1 text-purple-400">RECENT WORK:</p>
-              <a href="#projects" className="text-blue-400 hover:underline">
-                1. Andriod Based Home Server
-              </a>
-              <a href="#projects" className="text-blue-400 hover:underline">
-                2. Zabcal
-              </a>
+              {PROJECTS.map((project, i) => (
+                <a key={project.id} href="#projects" className="text-blue-400 hover:underline">
+                  {i + 1}. {project.title}
+                </a>
+              ))}
             </div>
           );
         case 'contact':

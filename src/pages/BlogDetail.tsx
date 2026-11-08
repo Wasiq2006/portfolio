@@ -56,7 +56,7 @@ const BlogDetail = () => {
       el.setAttribute(attr, content);
       restore.push(() => (previous === null ? el.removeAttribute(attr) : el.setAttribute(attr, previous)));
     }
-    document.title = `${blog.title} | Muhammad Wasiq`;
+    document.title = `${blog.title} | Wasiq Mansoor`;
 
     return () => {
       document.title = previousTitle;

@@ -6,19 +6,15 @@ import NotFound from './pages/NotFound';
 import LoadingPage from './components/LoadingPage';
 import SmoothScroll from './components/SmoothScroll';
 import ThemeProvider from './components/ThemeProvider';
-import { useTheme } from './hooks/useTheme';
 
 // Blog posts are a separate route, so their markdown renderer loads on demand.
 const BlogDetail = lazy(() => import('./pages/BlogDetail'));
 
 const AppContent = () => {
-  const { isAnimating } = useTheme();
-
   return (
     <BrowserRouter>
       <SmoothScroll>
         <div className="relative">
-          {isAnimating && <div className="disk-transition-overlay" />}
           <LoadingPage />
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <Routes>
