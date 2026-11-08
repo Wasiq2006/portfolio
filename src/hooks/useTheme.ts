@@ -1,38 +1,24 @@
-import { useState, useEffect } from 'react';
+import { createContext, useContext } from 'react';
 
 export type Theme = 'light' | 'midnight-indigo';
 
-export const useTheme = () => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('theme') as Theme | null;
-    return saved || 'light';
-  });
+export interface ThemeContextValue {
+  theme: Theme;
+  toggleTheme: () => void;
+  /** True while the full-screen disk transition overlay is playing. */
+  isAnimating: boolean;
+}
 
-  const [isAnimating, setIsAnimating] = useState(false);
+export const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-  useEffect(() => {
-    const html = document.documentElement;
-    if (theme === 'midnight-indigo') {
-      html.classList.add('midnight-indigo');
-    } else {
-      html.classList.remove('midnight-indigo');
-    }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setIsAnimating(true);
-    
-    // Delay theme switch to sync with the expanding circle
-    setTimeout(() => {
-      setTheme((prev) => (prev === 'light' ? 'midnight-indigo' : 'light'));
-    }, 300);
-
-    // Remove animation state after transition completes
-    setTimeout(() => {
-      setIsAnimating(false);
-    }, 600);
-  };
-
-  return { theme, toggleTheme, isAnimating };
+/**
+ * Read the shared theme state. Must be used under <ThemeProvider>, so every
+ * caller (App's overlay, ThemeToggle, ...) sees the same state.
+ */
+export const useTheme = (): ThemeContextValue => {
+  const ctx = useContext(ThemeContext);
+  if (!ctx) {
+    throw new Error('useTheme must be used inside <ThemeProvider>');
+  }
+  return ctx;
 };
