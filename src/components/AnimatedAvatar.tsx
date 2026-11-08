@@ -12,7 +12,7 @@ const AnimatedAvatar = () => {
       <div className="relative w-full h-full border-2 border-foreground bg-card overflow-hidden group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300">
         <div className="w-full h-full animate-[float_6s_ease-in-out_infinite]">
           <img
-            src="/images/avatar.png.png"
+            src="/images/avatar.webp"
             alt="Muhammad Wasiq"
             className="w-full h-full object-cover object-top"
             loading="eager"

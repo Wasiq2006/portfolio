@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import blogsData from '@/data/blog.json';
 import { playClick } from '@/hooks/useSoundEffects';
 import CustomCursor from '@/components/CustomCursor';
+import { SITE_URL } from '@/data/constants';
 
 interface BlogPost {
   id: string;
@@ -24,29 +25,44 @@ const BlogDetail = () => {
   // Scroll to top and set page title & metadata when blog detail page loads
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (blog) {
-      document.title = `${blog.title} | Muhammad Wasiq`;
+    if (!blog) return;
 
-      const updateMetaTag = (selector: string, content: string) => {
-        let el = document.querySelector(selector);
-        if (el) {
-          el.setAttribute('content', content);
-        }
-      };
+    const ogImageUrl = blog.image
+      ? blog.image.startsWith('http')
+        ? blog.image
+        : `${SITE_URL}${blog.image}`
+      : `${SITE_URL}/images/Banner.png`;
 
-      const ogImageUrl = blog.image
-        ? (blog.image.startsWith('http') ? blog.image : `https://wasiq.tech${blog.image}`)
-        : 'https://wasiq.tech/images/Banner.png';
+    const overrides: Array<[selector: string, content: string, attr?: string]> = [
+      ['meta[name="description"]', blog.brief],
+      ['meta[property="og:title"]', blog.title],
+      ['meta[property="og:description"]', blog.brief],
+      ['meta[property="og:url"]', `${SITE_URL}/blog/${blog.id}`],
+      ['meta[property="og:image"]', ogImageUrl],
+      ['meta[property="og:image:secure_url"]', ogImageUrl],
+      ['meta[name="twitter:title"]', blog.title],
+      ['meta[name="twitter:description"]', blog.brief],
+      ['meta[name="twitter:image"]', ogImageUrl],
+      ['link[rel="canonical"]', `${SITE_URL}/blog/${blog.id}`, 'href'],
+    ];
 
-      updateMetaTag('meta[property="og:title"]', blog.title);
-      updateMetaTag('meta[property="og:description"]', blog.brief);
-      updateMetaTag('meta[property="og:image"]', ogImageUrl);
-      updateMetaTag('meta[property="og:image:secure_url"]', ogImageUrl);
-      updateMetaTag('meta[name="twitter:title"]', blog.title);
-      updateMetaTag('meta[name="twitter:description"]', blog.brief);
-      updateMetaTag('meta[name="twitter:image"]', ogImageUrl);
+    // Remember the homepage values so they can be put back when leaving the post.
+    const previousTitle = document.title;
+    const restore: Array<() => void> = [];
+    for (const [selector, content, attr = 'content'] of overrides) {
+      const el = document.querySelector(selector);
+      if (!el) continue;
+      const previous = el.getAttribute(attr);
+      el.setAttribute(attr, content);
+      restore.push(() => (previous === null ? el.removeAttribute(attr) : el.setAttribute(attr, previous)));
     }
-  }, [id, blog]);
+    document.title = `${blog.title} | Muhammad Wasiq`;
+
+    return () => {
+      document.title = previousTitle;
+      restore.forEach((undo) => undo());
+    };
+  }, [blog]);
 
   // Handle navigation back to blog section
   const handleBackToBlog = () => {

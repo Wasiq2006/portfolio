@@ -7,8 +7,11 @@ export const PROFILE = {
   shortName: 'Muhammad Wasiq',
   alias: 'Wasiq',
   email: 'wasiqmansoor2006@gmail.com',
-  website: 'wasiqs-portfolio.com',
+  website: 'www.wasiq.tech',
 } as const;
+
+/** Canonical origin. Keep in sync with SITE_URL in scripts/generate-blog-static-pages.js. */
+export const SITE_URL = 'https://www.wasiq.tech';
 
 export const SOCIAL_LINKS = [
   {
