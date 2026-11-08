@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'framer-motion';
 import { playClick, playHover } from '@/hooks/useSoundEffects';
 import {
@@ -10,12 +10,14 @@ import {
   BookOpen,
 } from 'lucide-react';
 import Magnetic from './Magnetic';
+import Typewriter from './Typewriter';
+import { useTheme } from '@/hooks/useTheme';
 import { PROFILE, SOCIAL_LINKS } from '@/data/constants';
 
 const roles = [
   'Security Researcher',
-  'Cloud Security Engineer',
-  'Cybersecurity Engineer',
+  'Cyber Security',
+  'Artificial Intelligence',
   'Linux System Administrator',
 ];
 
@@ -28,11 +30,10 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 const HeroSection = () => {
-  const [roleIndex, setRoleIndex] = useState(0);
-  const [displayText, setDisplayText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [cursorVisible, setCursorVisible] = useState(true);
-  const [theme, setTheme] = useState('light');
+  const { theme } = useTheme();
+  // Read by the canvas loop, so a theme change never restarts the animation.
+  const themeRef = useRef(theme);
+  const clearCanvasRef = useRef<() => void>();
 
   const containerRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -72,53 +73,14 @@ const HeroSection = () => {
     mouseY.set(0);
   };
 
-  // Listen for theme changes
-  useEffect(() => {
-    const checkTheme = () => {
-      const hasIndigoClass = document.documentElement.classList.contains('midnight-indigo');
-      setTheme(hasIndigoClass ? 'midnight-indigo' : 'light');
-    };
+  // On theme change, wipe the old-coloured trails but keep the drops falling.
+  // Layout effect so it lands inside the view-transition update, before the
+  // new-theme snapshot is taken.
+  useLayoutEffect(() => {
+    themeRef.current = theme;
+    clearCanvasRef.current?.();
+  }, [theme]);
 
-    checkTheme();
-    const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Blinking cursor
-  useEffect(() => {
-    const cursorInterval = setInterval(() => {
-      setCursorVisible((prev) => !prev);
-    }, 530);
-    return () => clearInterval(cursorInterval);
-  }, []);
-
-  // Typewriter effect
-  useEffect(() => {
-    const currentRole = roles[roleIndex];
-    const typeSpeed = isDeleting ? 40 : 80;
-
-    const timeout = setTimeout(() => {
-      if (!isDeleting) {
-        setDisplayText(currentRole.slice(0, displayText.length + 1));
-        if (displayText.length === currentRole.length) {
-          setTimeout(() => setIsDeleting(true), 2000);
-        }
-      } else {
-        setDisplayText(currentRole.slice(0, displayText.length - 1));
-        if (displayText.length === 0) {
-          setIsDeleting(false);
-          setRoleIndex((prev) => (prev + 1) % roles.length);
-        }
-      }
-    }, typeSpeed);
-
-    return () => clearTimeout(timeout);
-  }, [displayText, isDeleting, roleIndex]);
 
   // High-Contrast Theme-Adaptive Matrix Rain Canvas
   useEffect(() => {
@@ -130,8 +92,6 @@ const HeroSection = () => {
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    const isMidnight = document.documentElement.classList.contains('midnight-indigo');
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let width = window.innerWidth;
@@ -156,6 +116,7 @@ const HeroSection = () => {
 
     resize();
     window.addEventListener('resize', resize);
+    clearCanvasRef.current = () => ctx.clearRect(0, 0, width, height);
 
     const chars = '01{}[];:/*#=+-<>_$%&@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
@@ -167,7 +128,11 @@ const HeroSection = () => {
       animationId = requestAnimationFrame(draw);
 
       if (timestamp - lastFrameTime < frameInterval) return;
+      // Hold still during the theme reveal so the browser only moves the
+      // circular clip instead of repainting the page every frame.
+      if (document.documentElement.classList.contains('theme-switching')) return;
       lastFrameTime = timestamp;
+      const isMidnight = themeRef.current === 'midnight-indigo';
 
       // Background trail clear
       ctx.fillStyle = isMidnight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(245, 245, 245, 0.08)';
@@ -215,8 +180,9 @@ const HeroSection = () => {
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', resize);
+      clearCanvasRef.current = undefined;
     };
-  }, [theme]);
+  }, []);
 
   return (
     <section
@@ -238,36 +204,6 @@ const HeroSection = () => {
         className="absolute inset-0 z-0 pointer-events-none opacity-20 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:36px_36px]"
       />
 
-      {/* Top-left code comment with 3D Depth */}
-      <motion.div
-        style={{ rotateX, rotateY, translateZ: '30px' }}
-        className="absolute top-28 left-6 md:left-10 z-10 hidden md:block preserve-3d"
-      >
-        <p className="font-mono text-xs text-foreground/90 leading-relaxed font-medium bg-card/80 backdrop-blur-sm p-3 border border-foreground/10 shadow-sm">
-          // portfolio.tsx
-          <br />
-          // version: 3.0.0
-          <br />
-          // status: production
-          <br />
-          // last_build: {new Date().toISOString().split('T')[0]}
-        </p>
-      </motion.div>
-
-      {/* Top-right line numbers with 3D Depth */}
-      <motion.div
-        style={{ rotateX, rotateY, translateZ: '30px' }}
-        className="absolute top-28 right-6 md:right-10 z-10 hidden md:block preserve-3d"
-      >
-        <p className="font-mono text-xs text-foreground/80 leading-relaxed text-right font-medium bg-card/80 backdrop-blur-sm p-3 border border-foreground/10 shadow-sm">
-          {Array.from({ length: 6 }, (_, i) => (
-            <span key={i} className="block">
-              {String(i + 1).padStart(3, '0')}
-            </span>
-          ))}
-        </p>
-      </motion.div>
-
       {/* Main 3D Framer Motion Perspective Container */}
       <motion.div
         style={{
@@ -286,36 +222,19 @@ const HeroSection = () => {
             className="heading-brutal leading-[0.9] sm:leading-[0.85] tracking-tight px-2"
             style={{ fontSize: 'clamp(36px, 11vw, 140px)' }}
           >
-            <div className="glitch-text inline-block break-words max-w-full" data-text="Muhammad">
-              Muhammad
+            <div className="glitch-text inline-block break-words max-w-full" data-text="Wasiq">
+              Wasiq
             </div>
             <br />
-            <div className="glitch-text inline-block break-words max-w-full" data-text="Wasiq.">
-              <span className="text-foreground/20">Wasiq.</span>
+            <div className="glitch-text inline-block break-words max-w-full" data-text="Mansoor.">
+              <span className="text-foreground/20">Mansoor.</span>
             </div>
           </h1>
         </motion.div>
 
         {/* Typewriter role with Z-Depth Layering */}
-        <motion.div
-          style={{ transform: 'translateZ(60px)' }}
-          className="mt-6 h-8 flex items-center justify-center"
-        >
-          <span className="font-mono text-xs md:text-sm tracking-[0.2em] text-foreground/50">
-            {'< '}
-          </span>
-          <span className="font-mono text-xs md:text-sm tracking-[0.15em] text-foreground/80 font-bold">
-            {displayText}
-          </span>
-          <span
-            className={`font-mono text-xs md:text-sm text-foreground/80 transition-opacity duration-100 ${cursorVisible ? 'opacity-100' : 'opacity-0'
-              }`}
-          >
-            |
-          </span>
-          <span className="font-mono text-xs md:text-sm tracking-[0.2em] text-foreground/50">
-            {' />'}
-          </span>
+        <motion.div style={{ transform: 'translateZ(60px)' }}>
+          <Typewriter roles={roles} />
         </motion.div>
 
         {/* Tech tags with Z-Depth Layering */}
@@ -324,8 +243,8 @@ const HeroSection = () => {
           className="flex flex-wrap gap-2 justify-center mt-8 max-w-md mx-auto"
         >
           {[
-            'Cybersecurity',
-            'Cloud Security',
+            'Cyber Security',
+            'Artificial Intelligence',
             'Linux',
           ].map((tech) => (
             <span
@@ -371,7 +290,7 @@ const HeroSection = () => {
           <Magnetic strength={0.15}>
             <a
               href="/resume.pdf"
-              download="Muhammad_Wasiq_Resume.pdf"
+              download="Wasiq_Mansoor_Resume.pdf"
               onClick={playClick}
               className="group relative inline-flex items-center gap-2 px-6 py-3.5 sm:px-8 sm:py-4 border-2 border-foreground bg-foreground text-background text-xs sm:text-sm font-bold tracking-[0.15em] sm:tracking-[0.2em] uppercase transition-all duration-300 hover:bg-card hover:text-foreground rounded-none"
               style={{ boxShadow: '6px 6px 0px 0px currentColor' }}
@@ -384,15 +303,6 @@ const HeroSection = () => {
           </Magnetic>
         </motion.div>
       </motion.div>
-
-      {/* Bottom-right stats */}
-      <div className="absolute bottom-10 right-6 md:right-10 z-10 hidden md:block">
-        <div className="font-mono text-xs text-foreground text-right leading-relaxed font-medium bg-card/80 backdrop-blur-sm p-2.5 border border-foreground/10">
-          <p>const experience = "2+ years";</p>
-          <p>const projects = 2;</p>
-          <p>const passion = Infinity;</p>
-        </div>
-      </div>
 
       {/* Scroll indicator */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">

@@ -2,10 +2,16 @@ import { createContext, useContext } from 'react';
 
 export type Theme = 'light' | 'midnight-indigo';
 
+/** Viewport point the theme reveal grows from (e.g. the toggle button's center). */
+export interface RevealOrigin {
+  x: number;
+  y: number;
+}
+
 export interface ThemeContextValue {
   theme: Theme;
-  toggleTheme: () => void;
-  /** True while the full-screen disk transition overlay is playing. */
+  toggleTheme: (origin?: RevealOrigin) => void;
+  /** True while the theme reveal animation is running. */
   isAnimating: boolean;
 }
 
@@ -13,7 +19,7 @@ export const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 /**
  * Read the shared theme state. Must be used under <ThemeProvider>, so every
- * caller (App's overlay, ThemeToggle, ...) sees the same state.
+ * caller sees the same state.
  */
 export const useTheme = (): ThemeContextValue => {
   const ctx = useContext(ThemeContext);

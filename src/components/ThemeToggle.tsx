@@ -7,9 +7,11 @@ const ThemeToggle = () => {
 
   return (
     <button
-      onClick={() => {
+      onClick={(e) => {
         playClick();
-        toggleTheme();
+        // Grow the reveal from the button's centre (works for keyboard activation too).
+        const rect = e.currentTarget.getBoundingClientRect();
+        toggleTheme({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
       }}
       onMouseEnter={playHover}
       className="nav-link p-2 active:opacity-50 transition-opacity flex items-center justify-center"

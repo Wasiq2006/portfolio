@@ -224,22 +224,23 @@
     }
   }
 
-@keyframes disk-transition {
-  0% {
-    clip-path: circle(0% at 50% 50%);
-  }
-  100% {
-    clip-path: circle(150% at 50% 50%);
-  }
+/* Theme reveal (View Transitions API). ThemeProvider animates the clip-path of
+   the new snapshot; disable the default cross-fade so old/new don't blend. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
-.disk-transition-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  background-color: hsl(var(--foreground));
-  animation: disk-transition 0.6s ease-in-out forwards;
+::view-transition-new(root) {
+  z-index: 1;
+}
+
+/* While the reveal runs, colours must switch instantly underneath it. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
 }
 
   /* Glitch Effect */

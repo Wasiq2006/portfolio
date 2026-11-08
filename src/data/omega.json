@@ -1,0 +1,12 @@
+{
+  "comment": "Dot-matrix lowercase omega (ω). 1 = lit dot, 0 = unlit. Used by OmegaMark in the loading screen.",
+  "rows": [
+    "100000001",
+    "100000001",
+    "100010001",
+    "100010001",
+    "100010001",
+    "010101010",
+    "001000100"
+  ]
+}

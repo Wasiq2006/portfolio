@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
+import { currentNavigationType, initialScroll } from '@/lib/initialScroll';
 
 interface SmoothScrollProps {
   children: React.ReactNode;
@@ -37,18 +38,30 @@ export const SmoothScroll = ({ children }: SmoothScrollProps) => {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
 
+    // Decide once, at load, where the page should start (see initialScroll for the rules).
+    const start = initialScroll(
+      currentNavigationType(),
+      window.location.hash,
+      sessionStorage.getItem('portfolio_scroll_pos')
+    );
+    if (start.kind === 'top') {
+      // A reload starts over: forget the old position and drop a leftover #hash
+      // (e.g. from clicking a navbar link) so the next reload starts at the top too.
+      sessionStorage.removeItem('portfolio_scroll_pos');
+      if (window.location.hash) {
+        window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+      }
+    }
+
     const restoreSavedScroll = () => {
-      const savedPos = sessionStorage.getItem('portfolio_scroll_pos');
-      if (savedPos && window.location.pathname === '/' && !window.location.hash) {
-        const y = Number(savedPos);
-        if (!isNaN(y) && y > 0) {
-          lenis.scrollTo(y, { immediate: true });
-        }
-      } else if (window.location.hash) {
-        const target = document.querySelector(window.location.hash);
-        if (target) {
-          lenis.scrollTo(target as HTMLElement, { immediate: true });
-        }
+      if (window.location.pathname !== '/') return;
+      if (start.kind === 'position') {
+        lenis.scrollTo(start.y, { immediate: true });
+      } else if (start.kind === 'hash') {
+        const target = document.querySelector(start.hash);
+        if (target) lenis.scrollTo(target as HTMLElement, { immediate: true });
+      } else {
+        lenis.scrollTo(0, { immediate: true });
       }
     };
 
@@ -58,6 +71,13 @@ export const SmoothScroll = ({ children }: SmoothScrollProps) => {
     };
 
     window.addEventListener('loading-animation-complete', handleLoadingComplete);
+
+    // The mobile menu freezes the page behind it while open.
+    const handleScrollLock = (e: Event) => {
+      if ((e as CustomEvent<boolean>).detail) lenis.stop();
+      else lenis.start();
+    };
+    window.addEventListener('scroll-lock', handleScrollLock);
     // Also attempt restoration immediately if loading screen is not active
     restoreSavedScroll();
 
@@ -71,6 +91,7 @@ export const SmoothScroll = ({ children }: SmoothScrollProps) => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('loading-animation-complete', handleLoadingComplete);
+      window.removeEventListener('scroll-lock', handleScrollLock);
       cancelAnimationFrame(rafId);
       lenis.destroy();
       lenisRef.current = null;

@@ -46,11 +46,11 @@ blogData.blogs.forEach((post) => {
   const title = escapeAttr(post.title);
 
   // Replace Title
-  html = html.replace(/<title>.*?<\/title>/gi, `<title>${title} | Muhammad Wasiq</title>`);
+  html = html.replace(/<title>.*?<\/title>/gi, `<title>${title} | Wasiq Mansoor</title>`);
 
   // Replace og:title & twitter:title
-  html = html.replace(/<meta\s+property="og:title"\s+content=".*?"\s*\/?>/gi, `<meta property="og:title" content="${title} | Muhammad Wasiq" />`);
-  html = html.replace(/<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/gi, `<meta name="twitter:title" content="${title} | Muhammad Wasiq" />`);
+  html = html.replace(/<meta\s+property="og:title"\s+content=".*?"\s*\/?>/gi, `<meta property="og:title" content="${title} | Wasiq Mansoor" />`);
+  html = html.replace(/<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/gi, `<meta name="twitter:title" content="${title} | Wasiq Mansoor" />`);
 
   // Replace description
   const cleanDescription = escapeAttr(post.brief);
