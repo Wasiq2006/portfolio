@@ -2,7 +2,6 @@ import {
   Github,
   Linkedin,
   Mail,
-  Heart,
 } from 'lucide-react';
 import { PROFILE, SOCIAL_LINKS } from '@/data/constants';
 
@@ -57,7 +56,7 @@ const Finale = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 w-full mb-24 place-items-center max-w-lg mx-auto">
+        <div className="grid grid-cols-3 gap-4 w-full place-items-center max-w-lg mx-auto">
           {SOCIAL_LINKS.map((link) => {
             const Icon = ICON_MAP[link.id];
             if (!Icon) return null;
@@ -81,34 +80,14 @@ const Finale = () => {
             );
           })}
         </div>
-
-        <div className="flex flex-col md:flex-row items-center gap-4 text-center">
-          <div className="flex items-center gap-2 px-4 py-2 bg-green-100 border-2 border-green-600 rounded-none">
-            <span className="inline-block w-1.5 h-1.5 bg-green-400 rounded-none mr-1.5 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-green-800">
-              Available for Work
-            </span>
-          </div>
-          <p className="text-xs font-mono text-foreground/70 uppercase tracking-widest leading-loose max-w-sm">
-            Securing Systems, Automating Infrastructure, Protecting Networks 🛡️
-          </p>
-        </div>
       </div>
 
       {/* Extreme Bottom Bar */}
       <div className="w-full bg-background pt-10 pb-24 md:pb-10 px-6 mt-auto border-t border-foreground/10">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4 opacity-70">
-          <p className="text-[10px] md:text-[11px] font-mono text-foreground uppercase tracking-[0.1em] md:tracking-[0.2em] text-center md:text-left">
+        <div className="max-w-6xl mx-auto flex justify-center items-center opacity-70">
+          <p className="text-[10px] md:text-[11px] font-mono text-foreground uppercase tracking-[0.1em] md:tracking-[0.2em] text-center">
             © {currentYear} {PROFILE.name}
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[10px] md:text-[11px] font-mono text-foreground uppercase tracking-[0.1em] md:tracking-[0.2em] text-center md:text-right font-medium">
-            <span className="whitespace-nowrap">Designed & Engineered</span>
-            <span className="flex items-center gap-2">
-              <span>with</span>
-              <Heart className="w-3.5 h-3.5 text-foreground fill-foreground animate-heartbeat inline-block" />
-              <span>by {PROFILE.alias}</span>
-            </span>
-          </div>
         </div>
       </div>
     </section>
