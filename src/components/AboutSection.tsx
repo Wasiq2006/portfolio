@@ -8,13 +8,13 @@ const AboutSection = () => {
         <AnimatedAvatar />
         <div className="flex-1">
           <p className="body-text max-w-2xl">
-            I am a Computer Science student with a strong interest in Cyber Security and Artificial Intelligence. My journey into technology started during college when I learned about the OSI model, which sparked my curiosity about how systems communicate and where vulnerabilities exist. This led me to explore cybersecurity in depth, focusing on practical skills, tools, and real-world problem solving.
+            I'm a Computer Science student at SZABIST. I enjoy talking about tech, experimenting with different tools, and figuring out how things work under the hood.
           </p>
           <p className="body-text max-w-2xl mt-6">
-            As I gained experience working with Linux systems and networking, I developed a growing interest in Artificial Intelligence, especially computer vision and applying AI to real-world problems. In Shehri AI, I used YOLOv8 models to detect and score civic issues from photos, served through a hardened, rate-limited API. I enjoy working where security and AI meet: building systems that are intelligent, secure, and resilient.
+            My interests range from Linux and system internals to reverse engineering, binary exploitation, digital forensics, and machine learning. I also enjoy building projects, breaking things and learning something new along the way.
           </p>
           <p className="body-text max-w-2xl mt-6 mb-8">
-            I am actively building hands-on projects to strengthen my skills in cyber security and artificial intelligence, with a focus on applying what I learn in practical environments. I am passionate about continuous learning and staying updated with emerging technologies, aiming to build a strong career at the intersection of cyber security and AI.
+            When I'm not studying or working on a project, you'll probably find me exploring Linux, experimenting with a new idea, or diving into a technical rabbit hole.
           </p>
         </div>
       </div>
