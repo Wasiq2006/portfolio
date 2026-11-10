@@ -8,7 +8,6 @@ import {
   Github,
   Linkedin,
   Send,
-  LucideGlobe2,
 } from 'lucide-react';
 import { PROFILE, SOCIAL_LINKS } from '@/data/constants';
 
@@ -78,18 +77,6 @@ const ContactSection = () => {
                   <Copy className="w-4 h-4 text-foreground/40" />
                 )}
               </button>
-            </div>
-
-            <div className="flex items-center gap-4 p-4 border border-foreground/10 bg-card hover:border-foreground transition-colors duration-300 rounded-none">
-              <div className="p-3 bg-foreground text-background self-start rounded-none">
-                <LucideGlobe2 className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-foreground/50 mb-1">
-                  Current Status
-                </p>
-                <p className="font-mono text-sm">AVAILABLE_FOR_PROJECTS</p>
-              </div>
             </div>
           </div>
 

@@ -41,9 +41,9 @@ const ExperienceSection = () => (
             className="relative pl-8 md:pl-0 border-l md:border-l-0 border-foreground/20 md:grid md:grid-cols-[1fr_2fr] md:gap-8 pb-12 last:pb-0"
             onMouseEnter={playHover}
           >
+            <div className="md:hidden absolute top-1 -left-[5px] w-[9px] h-[9px] rounded-none bg-foreground"></div>
             <div className="md:text-right md:pr-8 md:border-r border-foreground/20 relative">
               <div className="hidden md:block absolute top-1 -right-[5px] w-[9px] h-[9px] rounded-none bg-foreground"></div>
-              <div className="md:hidden absolute top-1 -left-[5px] w-[9px] h-[9px] rounded-none bg-foreground"></div>
               <h4 className="font-mono text-xs tracking-widest text-foreground/60 uppercase mb-1">
                 {exp.period}
               </h4>
